@@ -1,0 +1,49 @@
+function apiCall(method, host, url, http, headers) {
+    reply = "";
+    conn = new Socket();    
+    conn.open (host + ":80", "binary")
+
+    request = method + " https://" + host + url + " " + http    
+    
+    for (i = 0; i < headers.length; i++) {
+        h = headers[i].header;
+        v = headers[i].value;
+
+        tempString = "\r\n" + h + ":" + v
+        request = request + tempString
+    }
+
+    request = request + "\r\n\r\n"
+    conn.write(request);
+    reply = conn.read(999999); 
+
+    conn.close();
+    
+    replyNoHeaders = reply.substr(reply.indexOf("\r\n\r\n")+4)
+    result = JSON.parse(replyNoHeaders);
+
+    return result
+}
+
+r = apiCall(
+    "GET",
+    "example.com",
+    "/api",
+    "HTTP/1.1",
+    [
+        {
+            header: "Host",
+            value: "example.com"
+        },
+        {
+            header: "Accept",
+            value: "application/json"
+        },
+        {
+            header: "Content-Type",
+            value: "application/json"
+        },
+    ]
+)
+
+alert(r)
